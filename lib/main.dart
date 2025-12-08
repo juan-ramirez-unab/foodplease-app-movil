@@ -7,17 +7,17 @@ import 'package:http/http.dart'
     as http; // Este import puede causar errores en Canvas.
 
 void main() {
-  runApp(const FoodPleaseLoginApp());
+  runApp(const FoodPleaseApp());
 }
 
 // Clase principal de la aplicación.
-class FoodPleaseLoginApp extends StatelessWidget {
-  const FoodPleaseLoginApp({super.key});
+class FoodPleaseApp extends StatelessWidget {
+  const FoodPleaseApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'FoodPlease Login',
+      title: 'FoodPlease App',
       theme: ThemeData(
         // Tema basado en el color naranja principal de la imagen.
         primarySwatch: Colors.orange,
@@ -26,10 +26,144 @@ class FoodPleaseLoginApp extends StatelessWidget {
         // Quitar el 'debug' banner.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      // Usamos un fondo ligeramente gris claro para simular el diseño de la imagen.
-      home: const Scaffold(
-        backgroundColor: Color(0xFFEBEBEB),
-        body: Center(child: LoginFormScreen()),
+      // La pantalla de bienvenida es ahora la pantalla de inicio.
+      home: const WelcomeScreen(),
+    );
+  }
+}
+
+// -----------------------------------------------------------------------------
+// PANTALLA DE BIENVENIDA (NUEVA PANTALLA INICIAL)
+// -----------------------------------------------------------------------------
+class WelcomeScreen extends StatelessWidget {
+  const WelcomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(
+        0xFFF9F6F2,
+      ), // Color de fondo beige claro de la imagen.
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              const SizedBox(height: 50),
+
+              // 1. Logo "FoodPlease"
+              const Text(
+                'FoodPlease',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFFF05B3A), // Naranja principal
+                ),
+              ),
+              const SizedBox(height: 30),
+
+              // 2. Imagen del Repartidor (Usando un placeholder con la misma idea)
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        spreadRadius: 2,
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.network(
+                      // Placeholder para simular la imagen del repartidor
+                      'https://placehold.co/400x400/FFD9C0/F05B3A?text=Delivery+Moto',
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const Center(
+                            child: Icon(
+                              Icons.delivery_dining,
+                              color: Color(0xFFF05B3A),
+                              size: 100,
+                            ),
+                          ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 40),
+
+              // 3. Texto de Bienvenida
+              const Text(
+                'Tu comida favorita, a un toque de distancia.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                  height: 1.3,
+                ),
+              ),
+              const SizedBox(height: 50),
+
+              // 4. Botón "Registrarse" (Primario)
+              ElevatedButton(
+                onPressed: () {
+                  // Simulación: Acción de Registrarse
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFF05B3A), // Naranja principal
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  elevation: 5,
+                ),
+                child: const Text(
+                  'Registrarse',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 15),
+
+              // 5. Botón "Iniciar Sesión" (Secundario)
+              ElevatedButton(
+                onPressed: () {
+                  // NAVEGA A LA PANTALLA DE LOGIN
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const LoginFormScreen(),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  // Estilo secundario (fondo claro, texto naranja)
+                  backgroundColor: const Color(
+                    0xFFFDDED6,
+                  ), // Tono pastel del naranja
+                  foregroundColor: const Color(0xFFF05B3A),
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  elevation: 0,
+                ),
+                child: const Text(
+                  'Iniciar Sesión',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 50),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -68,7 +202,6 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
 
     final email = _emailController.text;
     final password = _passwordController.text;
-    // Nueva URL de la API
     const url = 'https://api.restful-api.dev/objects';
 
     try {
@@ -96,6 +229,7 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
 
         if (loginSuccessful) {
           if (mounted) {
+            // Reemplazamos la pantalla de login con la lista de restaurantes
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
                 builder: (context) => const RestaurantListScreen(),
@@ -133,135 +267,140 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final horizontalPadding = screenWidth * 0.08;
 
-    return SafeArea(
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              const SizedBox(height: 50),
+    return Scaffold(
+      backgroundColor: const Color(0xFFEBEBEB), // Fondo gris claro
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                const SizedBox(height: 50),
 
-              // 1. Logo/Icono Central
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF05B3A),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(
-                  Icons.restaurant_menu,
-                  color: Colors.white,
-                  size: 40,
-                ),
-              ),
-              const SizedBox(height: 30),
-
-              // 2. Título de Bienvenida
-              const Text(
-                'Bienvenido de vuelta',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 8),
-
-              // 3. Subtítulo
-              const Text(
-                'Inicia sesión en tu cuenta de FoodPlease',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-              const SizedBox(height: 40),
-
-              // 4. Campo de Email
-              const Text(
-                'Email',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 8),
-              _buildTextField(
-                controller: _emailController,
-                hintText: 'ejemplo@correo.com',
-                keyboardType: TextInputType.text,
-              ),
-              const SizedBox(height: 25),
-
-              // 5. Campo de Contraseña
-              const Text(
-                'Contraseña',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 8),
-              _buildPasswordTextField(controller: _passwordController),
-              const SizedBox(height: 15),
-
-              // 6. Enlace "¿Olvidaste tu contraseña?"
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: _isLoading
-                      ? null
-                      : () {
-                          // Acción para recuperar contraseña
-                        },
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    minimumSize: const Size(50, 30),
-                    alignment: Alignment.centerRight,
+                // 1. Logo/Icono Central (El botón de retroceso está en el AppBar de la WelcomeScreen si volvemos)
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF05B3A),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Text(
-                    '¿Olvidaste tu contraseña?',
-                    style: TextStyle(
-                      color: _isLoading ? Colors.grey : const Color(0xFFF05B3A),
-                      fontWeight: FontWeight.w600,
+                  child: const Icon(
+                    Icons.restaurant_menu,
+                    color: Colors.white,
+                    size: 40,
+                  ),
+                ),
+                const SizedBox(height: 30),
+
+                // 2. Título de Bienvenida
+                const Text(
+                  'Bienvenido de vuelta',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                // 3. Subtítulo
+                const Text(
+                  'Inicia sesión en tu cuenta de FoodPlease',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+                const SizedBox(height: 40),
+
+                // 4. Campo de Email
+                const Text(
+                  'Email',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                _buildTextField(
+                  controller: _emailController,
+                  hintText: 'ejemplo@correo.com',
+                  keyboardType: TextInputType.text,
+                ),
+                const SizedBox(height: 25),
+
+                // 5. Campo de Contraseña
+                const Text(
+                  'Contraseña',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                _buildPasswordTextField(controller: _passwordController),
+                const SizedBox(height: 15),
+
+                // 6. Enlace "¿Olvidaste tu contraseña?"
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: _isLoading
+                        ? null
+                        : () {
+                            // Acción para recuperar contraseña
+                          },
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      minimumSize: const Size(50, 30),
+                      alignment: Alignment.centerRight,
+                    ),
+                    child: Text(
+                      '¿Olvidaste tu contraseña?',
+                      style: TextStyle(
+                        color: _isLoading
+                            ? Colors.grey
+                            : const Color(0xFFF05B3A),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 40),
+                const SizedBox(height: 40),
 
-              // 7. Botón "Ingresar"
-              ElevatedButton(
-                onPressed: _isLoading ? null : _login,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF05B3A),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                // 7. Botón "Ingresar"
+                ElevatedButton(
+                  onPressed: _isLoading ? null : _login,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFF05B3A),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 5,
                   ),
-                  elevation: 5,
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 3,
+                          ),
+                        )
+                      : const Text(
+                          'Ingresar',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
-                child: _isLoading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 3,
-                        ),
-                      )
-                    : const Text(
-                        'Ingresar',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-              ),
-              const SizedBox(height: 40),
-            ],
+                const SizedBox(height: 40),
+              ],
+            ),
           ),
         ),
       ),
@@ -378,7 +517,7 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
 }
 
 // -----------------------------------------------------------------------------
-// PANTALLA DE DETALLE DEL PRODUCTO (NUEVA)
+// PANTALLA DE DETALLE DEL PRODUCTO
 // -----------------------------------------------------------------------------
 class ProductDetailScreen extends StatelessWidget {
   final String productName;
@@ -829,7 +968,7 @@ class MenuDetailScreen extends StatelessWidget {
     return Opacity(
       opacity: opacity,
       child: GestureDetector(
-        // --- NAVEGACIÓN A LA PANTALLA DE DETALLE DEL PRODUCTO AL HACER CLICK ---
+        // NAVEGACIÓN A LA PANTALLA DE DETALLE DEL PRODUCTO
         onTap: isAvailable
             ? () {
                 Navigator.of(context).push(
@@ -964,11 +1103,9 @@ class RestaurantListScreen extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            // Regresar al login (simulando cerrar sesión)
+            // Regresar a la pantalla de bienvenida
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => const FoodPleaseLoginApp(),
-              ),
+              MaterialPageRoute(builder: (context) => const WelcomeScreen()),
             );
           },
         ),
